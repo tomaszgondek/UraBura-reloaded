@@ -1,5 +1,6 @@
 import re
 import csv
+import random
 from datetime import datetime
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
@@ -38,7 +39,7 @@ def recognize_device_type(code: str) -> str:
 class InventoryApp:
     def __init__(self, root):
         self.root = root
-        root.title("Inwentaryzacja - skanery kodów")
+        root.title("UraBura - winter sport edition")
         root.geometry("1000x600")
 
         frm_top = ttk.Frame(root, padding=8)
@@ -56,9 +57,6 @@ class InventoryApp:
         self.shop_combo.pack(side=tk.LEFT, padx=(0,12))
         self.shop_combo.bind("<<ComboboxSelected>>", self.switch_shop)
 
-        self.btn_delete_shop = ttk.Button(frm_top, text="Usuń sklep", command=self.delete_current_shop)
-        self.btn_delete_shop.pack(side=tk.LEFT, padx=(0,12))
-
         # Cash register entry + combobox
         ttk.Label(frm_top, text="Kasa:").pack(side=tk.LEFT, padx=(0,6))
         self.cash_register_var = tk.StringVar()
@@ -71,9 +69,6 @@ class InventoryApp:
         self.cash_register_combo.pack(side=tk.LEFT, padx=(0,12))
         self.cash_register_combo.bind("<<ComboboxSelected>>", self.switch_cash_register)
 
-        self.btn_delete_cash = ttk.Button(frm_top, text="Usuń kasę", command=self.delete_current_cash_register)
-        self.btn_delete_cash.pack(side=tk.LEFT, padx=(0,12))
-
         # Code entry
         ttk.Label(frm_top, text="Kod (numer seryjny):").pack(side=tk.LEFT)
         self.code_var = tk.StringVar()
@@ -85,11 +80,18 @@ class InventoryApp:
         # Menubutton z rozwijanym menu
         self.menu_button = ttk.Menubutton(frm_top, text="Więcej funkcji")
         self.menu = tk.Menu(self.menu_button, tearoff=0)
+        self.menu.add_command(label="Usuń sklep", command=self.delete_current_shop)
+        self.menu.add_command(label="Usuń kasę", command=self.delete_current_cash_register)
+        self.menu.add_separator()
         self.menu.add_command(label="Usuń zaznaczone", command=self.remove_selected)
-        self.menu.add_command(label="Wyczyść listę", command=self.clear_all)
+        self.menu.add_command(label="Usuń bieżącą listę", command=self.clear_all)
         self.menu.add_separator()
         self.menu.add_command(label="Eksportuj CSV", command=self.save_csv)
         self.menu.add_command(label="Importuj CSV", command=self.load_csv)
+        self.menu.add_separator()
+        self.menu.add_command(label="Policz ilość neuronów", command=self.neuron_count)
+        self.menu.add_separator()
+        self.menu.add_command(label="Wyjdź", command=self.root.quit)
         self.menu_button["menu"] = self.menu
         self.menu_button.pack(side=tk.RIGHT, padx=(6, 0))
 
@@ -411,6 +413,33 @@ class InventoryApp:
             messagebox.showinfo("Wczytano", f"Wczytano dane z:\n{path}")
         except Exception as e:
             messagebox.showerror("Błąd wczytywania", str(e))
+
+    # --- Easter Eggs ---
+    def neuron_count(self):
+        neurons = random.randrange(1, 8)
+        win = tk.Toplevel()
+        win.title("Liczenie neuronów")
+        width, height = 300, 120
+        screen_width = win.winfo_screenwidth()
+        screen_height = win.winfo_screenheight()
+        x = (screen_width // 2) - (width // 2)
+        y = (screen_height // 2) - (height // 2)
+        win.geometry(f"{width}x{height}+{x}+{y}")
+        win.resizable(False, False)
+        label = ttk.Label(win, text=f"Znaleziono {neurons}", anchor="center")
+        label.pack(pady=20)
+        btn_frame = ttk.Frame(win)
+        btn_frame.pack(pady=10)
+        def close_win():
+            win.destroy()
+        btn1 = ttk.Button(btn_frame, text="Nie, to musi być inaczej", command=close_win)
+        btn1.pack(side=tk.LEFT, padx=5)
+        btn2 = ttk.Button(btn_frame, text="Jeszcze jak!", command=close_win)
+        btn2.pack(side=tk.LEFT, padx=5)
+        win.transient()
+        win.grab_set()
+        win.wait_window()
+
 
 
 if __name__ == "__main__":
